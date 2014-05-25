@@ -7,8 +7,8 @@ require.config({
 
 require(['jquery','window'],function($, w){
 	$('#a').click(function(){
-		var window = new w.Window()
-		window.alert( {
+		var window = new w.Window();
+		window.alert({
 			width : 500,
 			height : 200,
 			y: 100,
@@ -17,12 +17,14 @@ require(['jquery','window'],function($, w){
 			hasCloseBtn : true,
 			dragHandler : '.window_header',
 			skinClassName : "window_skin_orange",
-			handler4CloseBtn : function(){
-				alert("closeBtn");
-			},
-			handler4AlertBtn : function(){
-				alert("alertBtn");
-			}
+		}).on("alert",function(){
+			alert('alert once');
+		}).on("alert",function(){
+			alert('alert twice');
+		}).on("close",function(){
+			alert('close once');
 		});
 	});
+
+
 });
