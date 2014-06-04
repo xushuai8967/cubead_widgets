@@ -5,8 +5,6 @@ body,html {
 
 .window_alert {
  	position: fixed;
- 	border: 1px solid #ccc;
-	box-shadow: 0 0 12px rgba(0,0,0,.5);
 	background: #fff;
  }
 
@@ -21,6 +19,7 @@ body,html {
 .window_body {
 	padding: 5px;
 }
+
 
 .window_closeBtn {
 	position : absolute;
@@ -41,27 +40,6 @@ body,html {
 	margin-left: -50px
 }
 
-/* skin for orange*/
-.window_skin_orange .window_alert {
-
-}
-.window_skin_orange .window_header {
-	background: #f1a513;
-}
-.window_skin_orange .window_closeBtn {
-	background: #f1a513;
-}
-.window_skin_orange .window_footer .window_alertBtn {
-	width:50px;
-	left:auto;
-	right:20px;
-	margin-left:0;
-	background: #f1a513;
-	border: none;
-	color: #fff;
-	padding: 10px
-}
-
 .window_mask {
  	width:100%;
  	height:100%;
@@ -72,3 +50,25 @@ body,html {
  	left:0;
  	top:0;
 }
+
+/* skin for img*/
+.window_skin_img .window_body{
+	padding : 0px;
+}
+.window_skin_img .window_header {
+	background: #f1a513;
+}
+.window_skin_img .window_closeBtn {
+	background: #f1a513;
+}
+.window_skin_img .window_footer .window_alertBtn {
+	width:50px;
+	left:auto;
+	right:20px;
+	margin-left:0;
+	background: #f1a513;
+	border: none;
+	color: #fff;
+	padding: 10px
+}
+

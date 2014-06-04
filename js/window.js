@@ -7,6 +7,7 @@ define(['widget','jquery','jqueryUI'], function(widget, $, $UI){
 			height : 200,
 			//弹窗内容
 			content : "",
+			hasTitle : true,
 			//标题
 			title : "系统消息",
 			//是否有按钮
@@ -38,13 +39,17 @@ define(['widget','jquery','jqueryUI'], function(widget, $, $UI){
 			var cfg = $.extend(this.config, config);
 			var box = $(
 				"<div class='window_alert'>" + 
-					"<div class='window_header'>" + cfg.title + "</div>" +
 					"<div class='window_body'>" + cfg.content + "</div>" +
 					"<div class='window_footer'> </div>" +
 				"</div>"
 				);
 
 			var _this = this;
+			var title = null;
+			if(cfg.hasTitle){
+				title = $('<div class="window_header">' + cfg.title + '</div>');
+				title.prependTo(box);
+			}
 			//注意mask要先于box添加到body上，否则会遮盖住弹窗
 			var mask = null;
 			if(cfg.hasMask){
