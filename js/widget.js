@@ -1,5 +1,7 @@
-define(function(){
-	function Widget(){}
+define(['jquery'], function($){
+	function Widget(){
+		this.boundingBox = null;
+	}
 	Widget.prototype = {
 		//绑定事件
 		on : function(type, handler){
@@ -17,6 +19,23 @@ define(function(){
 					handlers[i](data);
 				}
 			}
+		},
+
+		addDom : function(){},
+		bindActions : function(){},
+		init : function(){},
+		create : function(container){
+			this.addDom();
+			this.handlers = {};
+			this.bindActions();
+			this.init();
+			$(container || document.body).append(this.boundingBox);
+		},
+		beforeDestroy : function(){},
+		destroy : function(){
+			this.beforeDestroy();
+			this.boundingBox.off();
+			this.boundingBox.remove();
 		}
 	};
 

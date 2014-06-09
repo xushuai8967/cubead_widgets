@@ -33,8 +33,24 @@ body,html {
 	cursor: pointer;
 }
 
+.window_footer .window_confirmBtn {
+	width: 60px;
+	position: absolute;
+	bottom: 10px;
+	left : 40%;
+	margin-left: -50px
+}
+
+.window_footer .window_cancelBtn {
+	width: 60px;
+	position: absolute;
+	bottom: 10px;
+	left : 60%;
+	margin-left: -50px
+}
+
 .window_footer .window_alertBtn {
-	width: 100px;
+	width: 60px;
 	position: absolute;
 	bottom: 10px;
 	left : 50%;

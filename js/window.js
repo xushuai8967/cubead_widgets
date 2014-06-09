@@ -7,13 +7,16 @@ define(['widget','jquery','jqueryUI'], function(widget, $, $UI){
 			height : 200,
 			//弹窗内容
 			content : "",
-			hasTitle : true,
+			hasTitle : false,
 			//标题
 			title : "系统消息",
 			//是否有按钮
-			hasAlertBtn : true,
+			hasAlertBtn : false,
 			//弹窗中的按钮文字内容
 			alertBtnText : "确定",
+
+			confirmBtnText : "确定",
+			cancelBtnText : "取消",
 			//是否使用模态
 			hasMask : true,
 			//定制皮肤名称
@@ -29,7 +32,9 @@ define(['widget','jquery','jqueryUI'], function(widget, $, $UI){
 			//点击弹窗中的按钮后执行的函数
 			handler4AlertBtn : null,
 			//点击右上角关闭按钮后执行的函数
-			handler4CloseBtn : null
+			handler4CloseBtn : null,
+			handler4ConfirmBtn : null,
+			handler4CancelBtn : null
 		};
 		this.handlers = {
 
@@ -37,99 +42,132 @@ define(['widget','jquery','jqueryUI'], function(widget, $, $UI){
 	}
 
 	Window.prototype = $.extend({}, new widget.Widget(), {
-		alert:function(config){
-			var cfg = $.extend(this.config, config);
-			var box = $(
-				"<div class='window_alert'>" + 
-					"<div class='window_body'>" + cfg.content + "</div>" +
-					"<div class='window_footer'> </div>" +
-				"</div>"
-				);
-
-			var _this = this;
-			var title = null;
-			if(cfg.hasTitle){
-				title = $('<div class="window_header">' + cfg.title + '</div>');
-				title.prependTo(box);
+		addDom : function(){
+			var footer = "";
+			switch(this.config.type){
+				case "alert": 
+					footer = "<input type='button' value='" + this.config.alertBtnText + "' class='window_alertBtn'/>";
+					break;
+				case "confirm":
+					footer = "<input type='button' value='" + this.config.confirmBtnText + "' class='window_confirmBtn'/>" + 
+							 "<input type='button' value='" + this.config.cancelBtnText + "' class='window_cancelBtn'/>";
+					break;
+				default :
+					footer = "";
+					break;
 			}
-			//注意mask要先于box添加到body上，否则会遮盖住弹窗
-			var mask = null;
-			if(cfg.hasMask){
-				mask = $("<div class='window_mask'></div>");
-				mask.appendTo('body');
+
+			this.boundingBox = $("<div class='window_alert'>" + 
+					"<div class='window_body'>" + this.config.content + "</div>" +
+				"</div>");
+
+			if(this.config.type != "common"){
+				this.boundingBox.prepend('<div class="window_header">' + this.config.title + '</div>');
+				this.boundingBox.append("<div class='window_footer'> " + footer + " </div>");
 			}
-			//将弹窗添加到body
-			box.appendTo('body');
 
-			//为弹窗设定位置和大小
-			box.css({	
-				width : cfg.width + "px",
-				height : cfg.height + "px",
-				left : (cfg.x || (window.innerWidth - cfg.width) / 2) + "px",
-				top : (cfg.y || (window.innerHeight - cfg.height) / 2) + "px"
-			});
+			this.boundingBox.appendTo('body');
 
-			if (cfg.hasAlertBtn) {
-				var btn = $("<input type='button' class='window_alertBtn' value='" + cfg.alertBtnText + "'/>");
+			if(this.config.hasMask){
+				this._mask = $("<div class='window_mask'></div>");
+				this._mask.appendTo('body');
+			}
+
+			if (this.config.hasAlertBtn) {
+				var btn = $("<input type='button' class='window_alertBtn' value='" + this.config.alertBtnText + "'/>");
 				btn.appendTo('.window_footer');
-				btn.click(function(){
-					box.remove();
-					mask && mask.remove();
-					//调用绑定的alert方法
-					_this.fire('alert');
-				});
 			};
 
 			//弹窗右上角按钮
-			if(cfg.hasCloseBtn){
+			if(this.config.hasCloseBtn){
 				var closeBtn = $("<span class='window_closeBtn'>X<span>");
-				closeBtn.appendTo(box);
-				closeBtn.click(function(){
-					//调用绑定的close方法
-					_this.fire('close');
-					box.remove();
-					mask && mask.remove();
-				});
-			}
-			//设定弹窗皮肤
-			if(cfg.skinClassName){
-				box.addClass(cfg.skinClassName);
-			}
-			//设定拖拽事件
-			if (cfg.isDraggable) {
-				if(cfg.dragHandler){
-					box.draggable({
-						handle : cfg.dragHandler,
-						cursor: "move", 
-						containment: "parent"
-					});
-				} else {
-				}
+				closeBtn.appendTo(this.boundingBox);
 			}
 
-			if(cfg.isResizable){
+		},
+
+		bindActions:function(){
+			//为控件绑定事件
+			var _this = this;
+			this.boundingBox.delegate(".window_alertBtn", "click", function(){
+				_this.fire("alert");
+				_this.destroy();
+			}).delegate(".window_closeBtn", "click", function(){
+				_this.fire("close");
+				_this.destroy();
+			}).delegate(".window_confirmBtn", "click", function(){
+				_this.fire("confirm");
+				_this.destroy();
+			}).delegate(".window_cancelBtn", "click", function(){
+				_this.fire("cancel");
+				_this.destroy();
+			});
+			if(this.config.handler4AlertBtn){
+				this.on('alert', this.config.handler4AlertBtn);
+			}
+			if(this.config.handler4CloseBtn){
+				this.on('close', this.config.handler4CloseBtn);
+			}
+			if(this.config.handler4ConfirmBtn){
+				this.on('confirm', this.config.handler4ConfirmBtn);
+			}
+			if(this.config.handler4CancelBtn){
+				this.on('cancel', this.config.handler4CancelBtn);
+			}
+		},
+
+		init : function(){
+			this.boundingBox.css({	
+				width : this.config.width + "px",
+				height : this.config.height + "px",
+				left : (this.config.x || (window.innerWidth - this.config.width) / 2) + "px",
+				top : (this.config.y || (window.innerHeight - this.config.height) / 2) + "px"
+			});
+
+			//设定弹窗皮肤
+			if(this.config.skinClassName){
+				this.boundingBox.addClass(this.config.skinClassName);
+			}
+
+			if (this.config.isDraggable && this.config.dragHandler) {
+				this.boundingBox.draggable({
+					handle : this.config.dragHandler,
+					cursor: "move", 
+					containment: "parent"
+				});
+			}
+
+			if(this.config.isResizable){
 				//需要引入jqueryui的css，否则无法工作
-				box.addClass('.ui-resizable-helper');
+				this.boundingBox.addClass('.ui-resizable-helper');
 				$('.ui-resizable-helper').css({
 					"border" : "1px dotted gray"
 				});
-				box.resizable({
+				this.boundingBox.resizable({
 			    	animate: true
 			    });
 			}
+		},
 
-			//为控件绑定事件
-			if(cfg.handler4AlertBtn){
-				this.on('alert', cfg.handler4AlertBtn);
-			}
+		beforeDestroy : function(){
+			this._mask && this._mask.remove();
+		},
 
-			if(cfg.handler4CloseBtn){
-				this.on('close', cfg.handler4CloseBtn);
-			}
-
+		alert : function(cfg){
+			$.extend(this.config, cfg, {type:"alert"});
+			this.create();
 			return this;
 		},
-		confirm:function(){},
+		confirm:function(cfg){
+			$.extend(this.config, cfg, {type:"confirm"});
+			this.create();
+			return this;
+		},
+		common : function(cfg){
+			$.extend(this.config, cfg, {type:"common"});
+			this.create();
+			return this;			
+		},
 		prompt:function(){}
 	});
 
