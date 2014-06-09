@@ -22,6 +22,8 @@ define(['widget','jquery','jqueryUI'], function(widget, $, $UI){
 			hasCloseBtn : false,
 			//是否支持拖拽
 			isDraggable : true,
+
+			isResizable : true,
 			//拖拽绑定事件
 			dragHandler : null,
 			//点击弹窗中的按钮后执行的函数
@@ -97,11 +99,24 @@ define(['widget','jquery','jqueryUI'], function(widget, $, $UI){
 			if (cfg.isDraggable) {
 				if(cfg.dragHandler){
 					box.draggable({
-						handle : cfg.dragHandler
+						handle : cfg.dragHandler,
+						cursor: "move", 
+						containment: "parent"
 					});
 				} else {
 				}
-			};
+			}
+
+			if(cfg.isResizable){
+				//需要引入jqueryui的css，否则无法工作
+				box.addClass('.ui-resizable-helper');
+				$('.ui-resizable-helper').css({
+					"border" : "1px dotted gray"
+				});
+				box.resizable({
+			    	animate: true
+			    });
+			}
 
 			//为控件绑定事件
 			if(cfg.handler4AlertBtn){
